@@ -1,0 +1,231 @@
+/* Trang */
+body{
+  background:#fff;
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  overflow:hidden;
+  text-align:center;
+}
+
+/* ===== PHONG BÌ GẦN ĐÁY ===== */
+.envelope{
+  position:fixed;
+  left:50%;
+  bottom:32px;
+  transform:translateX(-50%);
+  width:420px;
+  height:280px;
+  cursor:pointer;
+  perspective:1200px;
+  overflow:visible; /* cho phép thư trồi ra nhưng vẫn bị tam giác che */
+}
+
+/* NỀN chữ nhật — GIỮ THEO SỐ LIỆU CỦA BẠN */
+.base{
+  position:absolute; inset:0;
+  background:linear-gradient(#f8c5cb, #fdbdc8);
+  box-shadow:0 18px 40px rgba(246, 152, 199, 0.25);
+  z-index:1;
+}
+
+/* === 3 TAM GIÁC CHE THƯ (to & chồng lên) — GIỮ THEO SỐ LIỆU CỦA BẠN === */
+.tri{ position:absolute; inset:0; }
+.tri.side.left{
+  background:#f49ab0;
+  clip-path:polygon(0% 0%, 48% 50%, 0% 100%);
+  z-index:3;          /* trên thư */
+}
+.tri.side.right{
+  background:#f49ab0;
+  clip-path:polygon(100% 0%, 52% 50%, 100% 100%);
+  z-index:3;          /* trên thư */
+}
+.tri.bottom{
+  background:#f2afbc;
+  clip-path:polygon(0% 100%, 50% 40%, 100% 100%);
+  z-index:4;          /* trên side */
+}
+
+/* NẮP TRÊN (đúng chiều) — GIỮ THEO SỐ LIỆU CỦA BẠN */
+.tri.flap{
+  background:#f7a4b8;
+  clip-path:polygon(0% 0%, 100% 0%, 50% 55%);
+  transform-origin:50% 0%;
+  transition:transform 2s ease;
+  z-index:5;          /* dưới seal */
+}
+.envelope.open .tri.flap{ transform:rotateX(-150deg); }
+
+/* Seal */
+.seal{
+  position:absolute; left:50%; top:42%;
+  transform:translate(-50%,-50%);
+  font-size:48px; line-height:1;
+  color:#ff4d6d;
+  z-index:6;
+  animation:heartbeat 1.4s ease-in-out infinite;
+}
+@keyframes heartbeat{
+  0%,100%{ transform:translate(-50%,-50%) scale(1) }
+  50%{ transform:translate(-50%,-50%) scale(1.2) }
+}
+
+/* 📜 Lá thư – giữ vị trí/z-index như bạn đã cấu hình */
+.letter{
+  position:absolute;
+  width: 90%; height: 90%;
+  left: 5%; bottom: 5%;           /* mấp mé trong phong bì: khi mở nắp thấy một phần tiêu đề */
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 6px 18px rgba(0,0,0,.12);
+  box-sizing:border-box;
+  z-index:2;                /* luôn dưới 3 tam giác */
+  overflow:hidden;
+  transition:bottom 1.2s ease, transform 1.2s ease;
+  perspective: 1200px;      /* 👈 cần cho flip 3D */
+}
+
+/* Kéo thư lên (sau khi mở nắp) – giữ z-index:2 để KHÔNG đè lên tam giác */
+.envelope.pull .tri.flap{
+    z-index: 1;
+}
+.envelope.pull .letter{
+  bottom:calc(80% + 32px);
+  transform:translateY(-16px);
+}
+
+/* 🌸 Hoa xuất hiện sau khi mở phong bì (ở SAU lá thư) */
+.flower{
+  position: absolute;
+  bottom:70%;                 /* ngang mép dưới của lá thư đang nằm trong bì */
+  width: 200px;                /* chỉnh theo ảnh thực tế */
+  opacity: 0;
+  transform: translateY(16px) scale(0.92);
+  transition: opacity .9s ease, transform .9s ease;
+  z-index: 0;                  /* = thư, NHƯNG thư nằm sau trong DOM nên vẫn ở TRÊN */
+  pointer-events: none;
+}
+
+/* căn theo vị trí lá thư: thư có left:7%; width:86% => mép hai bên cách biên bì 7%  */
+.flower-left{
+  left: -110px;                 /* hơi thò ra ngoài bì, tùy chỉnh */
+  transform-origin: right bottom;
+}
+.flower-right{
+  right: -130px;
+  transform-origin: left bottom;
+}
+
+/* Khi mở phong bì -> hoa trồi lên (xuất hiện sớm, trước lúc kéo thư) */
+.envelope.pull .flower{
+  opacity: 1;
+  transform: translateY(-6px) scale(1);
+}
+
+/* Nếu muốn hoa xuất hiện CHỈ khi thư bắt đầu kéo lên, dùng .pull thay .open ở trên */
+
+/* —— Page-flip —— */
+.sheet{
+  position:absolute; inset:0;
+  transform-style: preserve-3d;
+  transition: transform .9s ease;
+  border-radius: 12px;
+}
+
+/* Mặt trang */
+.face{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  backface-visibility: hidden;
+  background:#fff;
+  border-radius: 12px;
+}
+
+/* Trang 1 (mặt trước) — tiêu đề lớn */
+.face.front .title{
+  width:100%;
+  font-family:"Playfair Display", serif;
+  font-weight:800;
+  line-height:1.05;
+  text-align:center;
+  color:#c15c6f;
+  font-size:clamp(28px, 6vw, 46px);
+  letter-spacing:.5px;
+}
+.face.front .title > div{ margin:2px 0; }
+
+/* Trang 2 (mặt sau) */
+.face.back{
+  transform: rotateY(180deg);
+}
+/* .face.back .content{
+  white-space: pre-line;
+  font-size:16px;
+  color:#333;
+  line-height:1.6;
+  text-align:left;
+  max-height:100%;
+  overflow:hidden;
+  padding:26px 22px;
+} */
+
+/* Khi lật sang trang 2 */
+.letter.flip .sheet{
+  transform: rotateY(180deg);
+}
+
+/* (tuỳ chọn) đổ bóng nhẹ khi lật */
+.letter:not(.flip) .sheet{ box-shadow: 0 0 0 rgba(0,0,0,0); }
+.letter.flip .sheet{ box-shadow: 0 10px 24px rgba(0,0,0,.12); }
+
+
+/* Nút nhạc (tuỳ chọn) */
+#musicBtn{
+  position:fixed; right:20px; bottom:20px;
+  background:pink; border:none; padding:10px 16px;
+  border-radius:10px; box-shadow:0 2px 8px rgba(255,105,180,.35);
+  cursor:pointer; font-weight:700;
+}
+#musicBtn:hover{ transform:translateY(-1px); }
+
+/* ❤️ Trái tim bay */
+.floating-heart {
+  position: absolute;
+  color: #ff6fa0;
+  font-size: 24px;
+  animation: fly 4s linear forwards;
+}
+@keyframes fly {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-600px) scale(1.5); opacity: 0; }
+}
+
+/* Typing: chỉ giữ định dạng & caret */
+/* Container trang 2 */
+.face.back .content{
+  white-space: pre-wrap;     /* để DOM quyết định xuống dòng (có <br>) */
+  text-align: justify;        /* đổi sang justify nếu bạn thích */
+  line-height: 1.7;
+  color: #333;
+  max-height: 100%;
+  overflow: hidden;        /* bật auto sau khi gõ xong trong JS */
+  padding: 26px 22px;
+}
+
+/* Mỗi dòng là block riêng */
+.content .line{
+  display: block;
+  margin: 0 0 .6rem 0;
+}
+
+/* Caret rời, kích thước cố định */
+.content .line .typeText{ display: inline; white-space: pre-wrap; }
+.content .line .caret{
+  display: inline-block;
+  width: 1ch; height: 1em;
+  border-left: 2px solid currentColor;
+  vertical-align: -0.1em;
+  animation: caretBlink .9s steps(1) infinite;
+}
+@keyframes caretBlink{ 50% { border-color: transparent; } }
+
+

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thư 20/10 💌</title>
+
+  <!-- Font đẹp cho tiêu đề -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- Nhạc (tuỳ chọn) -->
+  <audio id="bgMusic" src="music.mp3" preload="auto" loop></audio>
+
+  <!-- ✉️ PHONG BÌ gần đáy -->
+  <div class="envelope" id="envelope">
+    <!-- Nền chữ nhật -->
+    <div class="base"></div>
+
+    <!-- 4 tam giác -->
+    <div class="tri side left"></div>
+    <div class="tri side right"></div>
+    <div class="tri bottom"></div>
+    <div class="tri flap"></div>
+
+    <!-- Trái tim -->
+    <div class="seal">❤</div>
+
+      <!-- 🌸 Hoa (phía sau lá thư) -->
+    <img src="img/flower_left.png"  alt="Hoa trái"  class="flower flower-left">
+    <img src="img/flower_right.png" alt="Hoa phải"  class="flower flower-right">
+
+    <!-- 📜 Lá thư (bên trong) -->
+    <div class="letter" id="letter">
+      <div class="sheet" id="sheet">
+        <!-- Trang 1: tiêu đề lớn, mỗi chữ một dòng -->
+        <div class="face front">
+          <div class="title">
+            <div>Happy</div>
+            <div>Women’s</div>
+            <div>Day</div>
+            <div>20/10</div>
+          </div>
+        </div>
+
+        <!-- Trang 2: nội dung -->
+        <div class="face back">
+          <div id="letter-content" class="content">Đang tải thư...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nút nhạc (tuỳ chọn) -->
+  <button id="musicBtn">🎵 Phát nhạc</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
