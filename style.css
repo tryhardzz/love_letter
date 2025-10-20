@@ -90,6 +90,102 @@ body{
   transform:translateY(-16px);
 }
 
+/* —— PAGE FLIP —— */
+.sheet {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 2s cubic-bezier(0.77, 0, 0.175, 1);
+  /* cubic-bezier cho cảm giác “đẩy rồi trượt nhẹ” */
+  border-radius: 12px;
+  perspective: 1500px;
+}
+
+/* Hai mặt của tờ giấy */
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 12px;
+  backface-visibility: hidden;  /* ✨ quan trọng: ẩn mặt sau khi quay đi */
+  transform-style: preserve-3d;
+  overflow: hidden;
+}
+
+/* Trang trước */
+.face.front .title {
+  width: 100%;
+  font-family: "Playfair Display", serif;
+  font-weight: 800;
+  line-height: 1.05;
+  text-align: center;
+  color: #c15c6f;
+  font-size: clamp(28px, 6vw, 46px);
+  letter-spacing: 0.5px;
+}
+.face.front .title > div { margin: 2px 0; }
+
+/* Trang sau */
+.face.back {
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+}
+
+/* Khi flip */
+.letter.flip .sheet {
+  transform: rotateY(180deg);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  transition: transform 2s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+/* Khi chưa flip */
+.letter:not(.flip) .sheet {
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+/* Thêm cảm giác “độ dày nhẹ” cho tờ giấy */
+.face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(255,255,255,0), rgba(0,0,0,0.05));
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+.letter.flip .face::after {
+  opacity: 0.3;
+}
+
+/* 🖋️ NỘI DUNG TRANG 2 */
+.face.back .content {
+  white-space: pre-wrap;
+  text-align: justify;
+  line-height: 1.7;
+  color: #333;
+  max-height: 100%;
+  overflow: hidden;
+  padding: 26px 22px;
+  visibility: hidden; /* Ẩn tạm nội dung thư  */
+}
+
+/* Gõ từng dòng */
+.content .line { display: block; margin: 0 0 0.6rem 0; }
+.content .line .typeText { display: inline; white-space: pre-wrap; }
+.content .line .caret {
+  display: inline-block;
+  width: 1ch;
+  height: 1em;
+  border-left: 2px solid currentColor;
+  vertical-align: -0.1em;
+  animation: caretBlink 1s steps(1) infinite;
+}
+@keyframes caretBlink { 50% { border-color: transparent; } }
+
+
 /* 🌸 HOA TRANG TRÍ */
 .flower{
   position:absolute;
@@ -97,7 +193,7 @@ body{
   width:200px;
   opacity:0;
   transform:translateY(16px) scale(0.92);
-  transition:opacity .9s ease, transform .9s ease;
+  transition:opacity .9s ease, transform 3s ease;
   z-index:0;
   pointer-events:none;
 }
@@ -114,35 +210,48 @@ body{
   transform:translateY(-6px) scale(1);
 }
 
-/* —— PAGE FLIP —— */
-.sheet{
-  position:absolute; inset:0;
-  transform-style:preserve-3d;
-  transition:transform .9s ease;
-  border-radius:12px;
+/* 🖼️ ẢNH 2 BÊN – hiện khi flip trang 2 */
+.photo-frame{
+  --tilt: 0deg;                 /* góc nghiêng mặc định */
+  position:absolute;
+  bottom:10%;
+  width:180px; height:220px;
+  padding:8px;
+  background:linear-gradient(145deg,#fffaf6,#f1e4d3);
+  border:4px solid #e0cbb0; border-radius:10px;
+  box-shadow:0 6px 16px rgba(0,0,0,.25), inset 0 0 8px rgba(255,255,255,.8);
+  display:flex; justify-content:center; align-items:center;
+  opacity:0;
+  /* trạng thái đóng: trượt xuống + thu nhỏ, vẫn giữ góc nghiêng */
+  transform: rotate(var(--tilt)) translateY(30px) scale(0.9);
+  transform-origin: center bottom;
+  transition: opacity 1s ease, transform 3s ease;
+  z-index:8; pointer-events:none;
 }
-.face{
-  position:absolute; inset:0;
-  display:flex; align-items:center; justify-content:center;
-  backface-visibility:hidden;
-  background:#fff;
-  border-radius:12px;
+.photo-frame img{
+  width:100%; height:100%; object-fit:cover;
+  border-radius:6px; filter:brightness(.97);
 }
-.face.front .title{
-  width:100%;
-  font-family:"Playfair Display",serif;
-  font-weight:800;
-  line-height:1.05;
-  text-align:center;
-  color:#c15c6f;
-  font-size:clamp(28px,6vw,46px);
-  letter-spacing:.5px;
+
+/* Góc nghiêng & vị trí từng khung */
+.left-frame  { --tilt:-10deg; left:calc(50% - 220px); }
+.right-frame { --tilt: 15deg; right:calc(50% - 220px); }
+
+/* Khi thư kéo (bạn đang dùng .envelope.pull) → hiện + nổi lên, GIỮ góc nghiêng */
+.envelope.pull .photo-frame{
+  opacity:1;
+  transform: rotate(var(--tilt)) translateY(0) scale(1);
+  transition-delay:5s;                    /* như bạn đặt */
+  /* lắc nhịp nhàng theo đúng tilt */
+  animation: floatFrame 3.5s ease-in-out 2s infinite;
 }
-.face.front .title>div{ margin:2px 0; }
-.face.back{ transform:rotateY(180deg); }
-.letter.flip .sheet{ transform:rotateY(180deg); }
-.letter:not(.flip) .sheet{ box-shadow:0 0 0 rgba(0,0,0,0); }
-.letter.flip .sheet{ box-shadow:0 10px 24px rgba(0,0,0,.12); }
+
+/* Float theo góc nghiêng hiện tại */
+@keyframes floatFrame{
+  0%,100% { transform: rotate(var(--tilt)) translateY(0)    scale(1);    }
+  50%     { transform: rotate(var(--tilt)) translateY(-5px) scale(1.03); }
+}
+
 
 /* Nút nhạc */
 #musicBtn{
@@ -165,85 +274,82 @@ body{
   100%{ transform:translateY(-600px) scale(1.5); opacity:0; }
 }
 
-/* 🖋️ NỘI DUNG TRANG 2 */
-.face.back .content{
-  white-space:pre-wrap;
-  text-align:justify;
-  line-height:1.7;
-  color:#333;
-  max-height:100%;
-  overflow:hidden;
-  padding:26px 22px;
-}
-.content .line{ display:block; margin:0 0 .6rem 0; }
-.content .line .typeText{ display:inline; white-space:pre-wrap; }
-.content .line .caret{
-  display:inline-block;
-  width:1ch; height:1em;
-  border-left:2px solid currentColor;
-  vertical-align:-0.1em;
-  animation:caretBlink .9s steps(1) infinite;
-}
-@keyframes caretBlink{ 50%{ border-color:transparent; } }
-
 /* ===================================================== */
 /* 🧭 RESPONSIVE CHO MOBILE */
 /* ===================================================== */
+/* 📱 RESPONSIVE DƯỚI 450PX */
+/* ===================================================== */
 
-@media (max-width: 768px){
-  body{
-    overflow:auto; /* cho phép cuộn nếu cần */
+@media (max-width: 450px) {
+
+  body {
+    overflow: hidden;      /* tránh tràn ngang */
+    padding: 0;
+    margin: 0;
   }
 
-  .envelope{
-    width:90vw;
-    height:auto;
-    aspect-ratio:3/2; /* giữ tỉ lệ 420:280 */
-    bottom:16px;
+  /* ✉️ Phong bì */
+  .envelope {
+    width: 80vw;             /* vừa khung màn hình */
+    height: auto;
+    aspect-ratio: 3 / 2;     /* giữ đúng tỉ lệ */
+    bottom: 16px;
+    transform: translateX(-50%) scale(0.95); /* thu nhỏ nhẹ */
   }
 
-  .letter{
-    width:92%;
-    left:4%;
-    bottom:4%;
+  /* 📜 Lá thư */
+  .letter {
+    width: 90%;
+    left: 5%;
+    bottom: 4%;
+    border-radius: 10px;
   }
 
-  .seal{ font-size:40px; top:44%; }
-
-  .flower{
-    width:28vw;
-    bottom:68%;
-  }
-  .flower-left{ left:-60px; }
-  .flower-right{ right:-60px; }
-
-  .face.front .title{
-    font-size:clamp(22px,7vw,36px);
+  /* Khi kéo thư lên */
+  .envelope.pull .letter {
+    bottom: calc(85% + 16px);
+    transform: translateY(-10px);
   }
 
-  .face.back .content{
-    font-size:14px;
-    line-height:1.6;
-    padding:18px 16px;
+    /* 🌷 Tiêu đề trang 1 */
+  .face.front .title {
+    font-size: clamp(20px, 6.5vw, 30px);
+    line-height: 1.1;
+    padding: 8px;
   }
 
-  #musicBtn{
-    right:10px;
-    bottom:10px;
-    padding:8px 12px;
-    font-size:14px;
+  /* 🖋️ Nội dung trang 2 */
+  .face.back .content {
+    font-size: 13.5px;
+    line-height: 1.55;
+    padding: 14px 14px;
+    word-break: break-word;
   }
-}
 
-@media (max-width:480px){
-  .envelope{
-    width:94vw;
-    aspect-ratio:3/2;
-    bottom:10px;
+  /* 💌 Dấu niêm phong */
+  .seal {
+    font-size: 36px;
+    top: 45%;
   }
-  .flower{
-    width:34vw;
-    bottom:70%;
+
+  /* 🌸 Hoa */
+  .flower {
+    width: 30vw;
+    bottom: 85%;
   }
-  .face.back .content{ font-size:13px; }
+  .flower-left { left: -48px; }
+  .flower-right { right: -48px; }
+
+  .photo-frame{ width:120px; height:160px; bottom:5%; }
+  .left-frame { left:calc(50% - 160px); }
+  .right-frame{ right:calc(50% - 160px); }
+
+  /* 🔊 Nút nhạc */
+  #musicBtn {
+    right: 8px;
+    bottom: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
 }

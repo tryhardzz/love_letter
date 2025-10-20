@@ -26,10 +26,11 @@ envelope.addEventListener('click', () => {
   // Sau 3s kể từ lúc kéo thư → flip sang trang 2
   setTimeout(() => {
     letter.classList.add('flip');
-
-    // đợi animation flip bắt đầu ~150ms rồi triển khai “từng dòng”
-    setTimeout(() => typeLines(content), 200);
-  }, 3000 + 3000);
+    setTimeout(() => {
+      content.style.visibility = 'visible';
+      typeLines(content);
+    }, 2000);
+  }, 6000);
 
   createHearts();
 
@@ -79,11 +80,6 @@ function typeLines(container){
     line.append(textEl, caretEl);
     container.appendChild(line);
 
-    // // CHÈN <br> cứng ngay sau dòng -> đảm bảo ngắt dòng 100%
-    // const br = document.createElement('br');
-    // br.className = 'hardbreak';
-    // container.appendChild(br);
-
     // gõ theo chuỗi (dòng sau chờ dòng trước)
     chain = chain
       .then(() => typeOneLine(textEl, caretEl, lineText, SPEED, container))
@@ -98,7 +94,7 @@ function typeOneLine(textEl, caretEl, text, speed, scrollContainer){
   return new Promise(resolve => {
     const chars = (text && text.length) ? [...text] : [' '];
     let i = 0;
-    caretEl.style.animation = 'caretBlink .9s steps(1) infinite';
+    caretEl.style.animation = 'caretBlink 1s steps(1) infinite';
 
     const timer = setInterval(() => {
       textEl.textContent += chars[i++];
