@@ -293,7 +293,7 @@ body{
     width: 80vw;             /* vừa khung màn hình */
     height: auto;
     aspect-ratio: 3 / 2;     /* giữ đúng tỉ lệ */
-    bottom: 16px;
+    bottom: 20vh;
     transform: translateX(-50%) scale(0.95); /* thu nhỏ nhẹ */
   }
 
