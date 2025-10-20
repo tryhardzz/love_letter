@@ -1,7 +1,7 @@
 import qrcode
 
 # Link đến web local hoặc online (nếu deploy sau này)
-url = "http://localhost:5500/love_letter.html"
+url = "https://tryhardzz.github.io/love_letter/"
 
 # Tạo QR
 qr = qrcode.QRCode(

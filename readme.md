@@ -20,4 +20,15 @@ love.txt → message text (each line = 1 displayed line)
 img/ → images (flowers, memories, etc.)
 music/ → optional mp3 background music
 
-
+   2 git --version
+   3 git init
+   4 git add .
+   5 git config --global --add safe.directory 'D:/Documents/学業/M1/love letter'
+   6 git add .
+   7 git commit -m "first upload"
+   8 git config --global user.email "em64036@nda.ac.jp"
+   9 git config --global user.name "Son"
+  10 git commit -m "first upload"
+  11 git branch -M main
+  12 git remote add origin https://github.com/tryhardzz/love_letter.git
+  13 git push -u origin main
